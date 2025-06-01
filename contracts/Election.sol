@@ -41,9 +41,22 @@ contract ElectionContract {
     event CandidateAdded(uint256 indexed electionId, address candidate);
     event VoteCast(uint256 indexed electionId, address voter, address candidate);
     event ResultDeclared(uint256 indexed electionId, address winner);
+    event AdminTransferred(address indexed oldAdmin, address indexed newAdmin);
 
     constructor() {
         admin = msg.sender;
+    }
+
+    // ADDED: Admin management functions
+    function transferAdmin(address newAdmin) public onlyAdmin {
+        require(newAdmin != address(0), "Invalid address");
+        address oldAdmin = admin;
+        admin = newAdmin;
+        emit AdminTransferred(oldAdmin, newAdmin);
+    }
+
+    function getAdmin() public view returns (address) {
+        return admin;
     }
 
     function createElection(
@@ -120,7 +133,7 @@ contract ElectionContract {
         emit ResultDeclared(_electionId, winnerAddress);
     }
 
-    // --- Added Getter Functions ---
+    // --- Getter Functions ---
 
     function getBasicElectionInfo(uint256 _electionId) public view returns (
         string memory title,
